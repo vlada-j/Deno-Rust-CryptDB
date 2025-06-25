@@ -34,20 +34,20 @@ Interactive command-line interface with multiple commands:
 
 2. **Run the application**
    ```bash
-   deno run --allow-ffi --allow-read src/main.ts
+   deno run --allow-ffi --allow-read --allow-write src/main.ts
    ```
 
 ### Usage Examples
 
 ```bash
 # Demonstrate async FFI with calculating Fibonacci number
-deno run --allow-ffi --allow-read src/main.ts fibonacci 10
+deno run --allow-ffi src/main.ts fibonacci 10
 
 # Test database functionality
-deno run --allow-ffi --allow-read src/main.ts test
+deno run --allow-ffi --allow-read --allow-write src/main.ts test
 
 # Demonstrate use of async callback from Rust
-deno run --allow-ffi --allow-read src/main.ts sleep 30
+deno run --allow-ffi src/main.ts sleep 15
 ```
 
 

@@ -4,14 +4,17 @@ interface FibonacciFunctions {
     fibonacci: {
         parameters: ["u32"];
         result: "u32";
+        nonblocking?: boolean;
     };
     sleep: {
         parameters: ["u64"];
         result: "void";
+        nonblocking?: boolean;
     };
     set_callback: {
         parameters: ["function"];
         result: "void";
+        nonblocking?: boolean;
     };
     [key: string]: Deno.ForeignFunction;
 }
@@ -41,8 +44,8 @@ function getLibraryPath(): string {
 export class RustFibonacciAdapter {
     private static instance: RustFibonacciAdapter;
     private symbols: FibonacciFunctions = {
-        fibonacci: { parameters: ["u32"], result: "u32" },
-        sleep: { parameters: ["u64"], result: "void" },
+        fibonacci: { parameters: ["u32"], result: "u32", nonblocking: true },
+        sleep: { parameters: ["u64"], result: "void", nonblocking: true },
         set_callback: { parameters: ["function"], result: "void" }
     };
     private dylib: Deno.DynamicLibrary<FibonacciFunctions>;
