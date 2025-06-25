@@ -1,0 +1,32 @@
+{
+  "name": "Deno-Rust-CryptDB",
+  "version": "1.0.0",
+  "description": "Integration of Deno with Encrypted Database in Rust through Foreign Function Interface (FFI)",
+
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": ["deno.window"],
+    "strict": true
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "fmt": {
+    "useTabs": true,
+    "indentWidth": 4,
+    "semiColons": true,
+    "singleQuote": false,
+    "proseWrap": "preserve"
+  },
+  "tasks": {
+    "dev": "deno run --allow-ffi --allow-read --allow-write src/main.ts",
+    "start": "deno run --allow-ffi --allow-read --allow-write src/main.ts",
+    "test": "deno run --allow-ffi --allow-read --allow-write src/main.ts test",
+    "fibonacci": "deno run --allow-ffi --allow-read --allow-write src/main.ts fibonacci 3"
+  },
+  "imports": {
+    "@std/path": "jsr:@std/path@1.0.8"
+  }
+}
