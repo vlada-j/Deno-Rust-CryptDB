@@ -6,10 +6,6 @@ pub fn fibonacci_recursive(n: u32) -> u64 {
     }
 }
 
-pub fn wait() {
-    std::thread::sleep(std::time::Duration::from_millis(1000));
-}
-
 static mut CALLBACK: Option<extern "C" fn(*const i8)> = None;
 
 #[no_mangle]
