@@ -1,15 +1,15 @@
-import { asyncEDB } from "./rustDatabaseAdapter.ts";
+import { cryptoDB } from "./rustDatabaseAdapter.ts";
 
 export async function performanceTest(dbPath: string, dbPassword: string) {
     console.log("\nPerformance Test: Multiple Async Queries");
 
-    const connId = await asyncEDB.openDatabase(dbPath, dbPassword);
+    const connId = await cryptoDB.openDatabase(dbPath, dbPassword);
     const startTime = performance.now();
     const promises = [];
 
     for (let i = 0; i < 10; i++) {
         promises.push(
-            asyncEDB.executeSQL(
+            cryptoDB.executeSQL(
                 connId,
                 `SELECT ${i} as query_id, COUNT(*) as count FROM users`,
             ),
@@ -24,5 +24,5 @@ export async function performanceTest(dbPath: string, dbPassword: string) {
     );
     console.log(`All queries successful: ${results.every((r) => r.success)}`);
 
-    asyncEDB.closeDatabase(connId);
+    cryptoDB.closeDatabase(connId);
 }

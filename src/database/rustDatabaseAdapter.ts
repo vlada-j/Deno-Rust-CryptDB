@@ -1,5 +1,5 @@
 /**
- * Async EDB (Encrypted Database) - Simplified FFI interface
+ * Crypto Database - Simplified FFI interface
  *
  * This module provides async SQL execution for the encrypted database.
  */
@@ -7,11 +7,11 @@
 import { resolve } from "@std/path";
 
 // Define the async SQL FFI interface
-interface AsyncEDBFunctions {
+interface CryptoDBFunctions {
 	open_encrypted_database: {
 		parameters: ["buffer", "buffer"],
 		result: "i64",
-		nonblocking: false,
+		nonblocking: true,
 	};
 	execute_sql_async: {
 		parameters: ["i64", "buffer", "function"],
@@ -39,7 +39,7 @@ interface AsyncEDBFunctions {
 // SQL Result interface
 export interface SQLResult {
 	success: boolean;
-	rows?: any[];
+	rows?: unknown[];
 	count?: number;
 	rows_affected?: number;
 	last_insert_rowid?: number;
@@ -69,12 +69,11 @@ function getLibraryPath(): string {
 	return resolve("./libs/crypto-db/target/release/", fileName);
 }
 
-/**
- * Async Encrypted Database class
- */
+
+
 export class RustDatabaseAdapter {
 	private static instance: RustDatabaseAdapter;
-	private lib: Deno.DynamicLibrary<AsyncEDBFunctions>;
+	private lib: Deno.DynamicLibrary<CryptoDBFunctions>;
 	private encoder = new TextEncoder();
 	private decoder = new TextDecoder();
 	private pendingCallbacks = new Map<number, (result: SQLResult) => void>();
@@ -82,14 +81,14 @@ export class RustDatabaseAdapter {
 	private constructor() {
 		// Load the dynamic library
 		const libraryPath = getLibraryPath();
-		console.log(`Loading EDB library from: ${libraryPath}`);
+		console.log(`Loading CryptoDB library from: ${libraryPath}`);
 
 		try {
 			this.lib = Deno.dlopen(libraryPath, {
 				open_encrypted_database: {
 					parameters: ["buffer", "buffer"],
 					result: "i64",
-					nonblocking: false,
+					nonblocking: true,
 				},
 				execute_sql_async: {
 					parameters: ["i64", "buffer", "function"],
@@ -112,9 +111,9 @@ export class RustDatabaseAdapter {
 					nonblocking: false,
 				},
 			});
-			console.log("EDB library loaded successfully");
+			console.log("CryptoDB library loaded successfully");
 		} catch (error: unknown) {
-			console.error(`Failed to load EDB library: ${error instanceof Error ? error.message : String(error)}`);
+			console.error(`Failed to load CryptoDB library: ${error instanceof Error ? error.message : String(error)}`);
 			throw error;
 		}
 	}
@@ -132,7 +131,7 @@ export class RustDatabaseAdapter {
 		const pathBuffer = this.stringToBuffer(path);
 		const keyBuffer = this.stringToBuffer(key);
 
-		const connId = this.lib.symbols.open_encrypted_database(
+		const connId = await this.lib.symbols.open_encrypted_database(
 			pathBuffer,
 			keyBuffer,
 		);
@@ -145,12 +144,12 @@ export class RustDatabaseAdapter {
 	}
 
 	// Execute SQL query asynchronously
-	public async executeSQL(connId: number, sql: string): Promise<SQLResult> {
+	public executeSQL(connId: number, sql: string): Promise<SQLResult> {
 		return new Promise((resolve, reject) => {
 			try {
 				const sqlBuffer = this.stringToBuffer(sql);
 
-				// Create callback function
+				// Create a callback function
 				const callback = new Deno.UnsafeCallback(
 					{ parameters: ["pointer"], result: "void" },
 					(resultPtr: Deno.PointerValue) => {
@@ -212,7 +211,7 @@ export class RustDatabaseAdapter {
 		const success = view.getUint8(16) === 1;
 		const rowsAffected = view.getBigInt64(24);
 
-		let result: SQLResult = { success };
+		const result: SQLResult = { success };
 
 		if (success && jsonDataPtr !== null) {
 			try {
@@ -278,4 +277,4 @@ export class RustDatabaseAdapter {
 }
 
 // Export the singleton instance
-export const asyncEDB = RustDatabaseAdapter.getInstance();
+export const cryptoDB = RustDatabaseAdapter.getInstance();

@@ -1,4 +1,4 @@
-import { asyncEDB, SQLResult } from "./rustDatabaseAdapter.ts";
+import { cryptoDB, SQLResult } from "./rustDatabaseAdapter.ts";
 
 export async function demonstrateAsyncSQL(dbPath: string, dbPassword: string) {
     console.log("Starting Async SQL Demonstration");
@@ -18,12 +18,12 @@ export async function demonstrateAsyncSQL(dbPath: string, dbPassword: string) {
     try {
         // 1. Open an encrypted database connection
         console.log("\nOpening encrypted database...");
-        connId = await asyncEDB.openDatabase(dbPath, dbPassword);
+        connId = await cryptoDB.openDatabase(dbPath, dbPassword);
         console.log(`✅ Database opened with connection ID: ${connId}`);
 
         // 2. Verify database encryption
         console.log("\nVerifying database encryption...");
-        const isEncrypted = asyncEDB.verifyEncryption(dbPath);
+        const isEncrypted = cryptoDB.verifyEncryption(dbPath);
         if (isEncrypted) {
             console.log("✅ Database is properly encrypted!");
         } else {
@@ -32,7 +32,7 @@ export async function demonstrateAsyncSQL(dbPath: string, dbPassword: string) {
 
         // 3. Create tables
         console.log("\nCreating tables...");
-        const createTableResult = await asyncEDB.executeSQL(
+        const createTableResult = await cryptoDB.executeSQL(
             connId,
             `
       CREATE TABLE IF NOT EXISTS users (
@@ -65,7 +65,7 @@ export async function demonstrateAsyncSQL(dbPath: string, dbPassword: string) {
         ];
 
         for (const query of insertQueries) {
-            const result: SQLResult = await asyncEDB.executeSQL(connId, query);
+            const result: SQLResult = await cryptoDB.executeSQL(connId, query);
             if (result.success) {
                 console.log(
                     `✅ Inserted user with ID: ${result.last_insert_rowid}`,
@@ -77,7 +77,7 @@ export async function demonstrateAsyncSQL(dbPath: string, dbPassword: string) {
 
         // 5. Query data
         console.log("\nQuerying all users...");
-        const selectResult: SQLResult = await asyncEDB.executeSQL(
+        const selectResult: SQLResult = await cryptoDB.executeSQL(
             connId,
             "SELECT * FROM users ORDER BY id",
         );
@@ -97,7 +97,7 @@ export async function demonstrateAsyncSQL(dbPath: string, dbPassword: string) {
 
         // 6. Update data
         console.log("\nUpdating user age...");
-        const updateResult: SQLResult = await asyncEDB.executeSQL(
+        const updateResult: SQLResult = await cryptoDB.executeSQL(
             connId,
             "UPDATE users SET age = 29 WHERE name = 'Alice Johnson'",
         );
@@ -110,7 +110,7 @@ export async function demonstrateAsyncSQL(dbPath: string, dbPassword: string) {
 
         // 7. Complex query with conditions
         console.log("\nQuerying users over 30...");
-        const complexQuery: SQLResult = await asyncEDB.executeSQL(
+        const complexQuery: SQLResult = await cryptoDB.executeSQL(
             connId,
             `
       SELECT name, email, age,
@@ -136,7 +136,7 @@ export async function demonstrateAsyncSQL(dbPath: string, dbPassword: string) {
 
         // 8. Delete some data
         console.log("\nDeleting user...");
-        const deleteResult: SQLResult = await asyncEDB.executeSQL(
+        const deleteResult: SQLResult = await cryptoDB.executeSQL(
             connId,
             "DELETE FROM users WHERE email = 'bob@example.com'",
         );
@@ -149,7 +149,7 @@ export async function demonstrateAsyncSQL(dbPath: string, dbPassword: string) {
 
         // 9. Final count
         console.log("\nFinal user count...");
-        const countResult: SQLResult = await asyncEDB.executeSQL(
+        const countResult: SQLResult = await cryptoDB.executeSQL(
             connId,
             "SELECT COUNT(*) as total FROM users",
         );
@@ -162,7 +162,7 @@ export async function demonstrateAsyncSQL(dbPath: string, dbPassword: string) {
 
         // 10. Test error handling
         console.log("\nTesting error handling...");
-        const errorResult: SQLResult = await asyncEDB.executeSQL(
+        const errorResult: SQLResult = await cryptoDB.executeSQL(
             connId,
             "SELECT * FROM non_existent_table",
         );
@@ -179,7 +179,7 @@ export async function demonstrateAsyncSQL(dbPath: string, dbPassword: string) {
         // 11. Clean up connection
         if (connId!) {
             console.log("\nClosing database connection...");
-            const closed = asyncEDB.closeDatabase(connId);
+            const closed = cryptoDB.closeDatabase(connId);
             console.log(
                 closed
                     ? "✅ Connection closed"
